@@ -11,7 +11,7 @@ import { validateBody } from '../middlewares/validateBody.js';
 import {
   createContactSchema,
   updateContactSchema,
-} from '../validation /validationContacts.js';
+} from '../validation/validationContacts.js';
 import { isValidId } from '../middlewares/isValidId.js';
 import { authenticate } from '../middlewares/authenticate.js';
 
