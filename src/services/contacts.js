@@ -4,7 +4,7 @@ export const getAllContacts = async () => {
   return contacts;
 };
 
-export const getContactById = async (contactId) => {
+export const getContactByID = async (contactId) => {
   const contact = await Contact.findById(contactId);
   return contact;
 };
