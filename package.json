@@ -1,7 +1,8 @@
 {
   "name": "nodejs-hw-mongodb",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/index.js",
+  "description": "",
   "type": "module",
   "scripts": {
     "lint": "eslint src/**/*.js",
@@ -9,9 +10,8 @@
     "dev": "nodemon src/index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Anatolii1203 <v120386t@gmail.com>",
   "license": "ISC",
-  "description": "",
   "devDependencies": {
     "@eslint/js": "^9.10.0",
     "eslint": "^9.10.0",
@@ -20,6 +20,8 @@
     "pino-pretty": "^11.2.2"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
