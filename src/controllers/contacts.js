@@ -1,46 +1,45 @@
-import createHttpError from 'http-errors';
 import {
+  createContact,
+  deleteContact,
   getAllContacts,
   getContactById,
-  createContact,
   updateContact,
-  deleteContact,
 } from '../services/contacts.js';
+import createHttpError from 'http-errors';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
-import { parseFilterParams } from '../utils/parseFilterParams.js';
+import parseContactFilterParams from '../utils/parseFilterParams.js';
 
-export const getContactsController = async (req, res) => {
+export const getContactsController = async (req, res, next) => {
   const { page, perPage } = parsePaginationParams(req.query);
   const { sortBy, sortOrder } = parseSortParams(req.query);
-  const filter = parseFilterParams(req.query);
-
+  const { _id: userId } = req.user;
+  const filter = parseContactFilterParams(req.query);
   const contacts = await getAllContacts({
     page,
     perPage,
     sortBy,
     sortOrder,
     filter,
-    userId: req.user._id,
+    userId,
   });
-
-  res.status(200).json({
+  res.json({
     status: 200,
-    message: 'Successfully found contacts!',
+    message: 'Sucessfully found contacts!',
     data: contacts,
   });
 };
 
 export const getContactByIdController = async (req, res, next) => {
   const { contactId } = req.params;
-
-  const contact = await getContactById(contactId, req.user._id);
-
+  const { _id: userId } = req.user;
+  const contact = await getContactById(contactId, userId);
+  console.log(contact);
   if (!contact) {
-    throw createHttpError(404, 'Contact not found');
+    throw createHttpError(404, `Contact with id ${contactId} not found`);
   }
 
-  res.status(200).json({
+  res.json({
     status: 200,
     message: `Successfully found contact with id ${contactId}!`,
     data: contact,
@@ -48,55 +47,46 @@ export const getContactByIdController = async (req, res, next) => {
 };
 
 export const createContactController = async (req, res) => {
-  const { name, phoneNumber, email, isFavourite, contactType } = req.body;
+  const { _id: userId } = req.user;
 
-  if (!name || !phoneNumber || !contactType) {
+  if (!req.body.name || !req.body.phoneNumber || !req.body.contactType) {
     throw createHttpError(
       400,
-      'Missing required fields: name, phoneNumber or contactType',
+      'Name, phoneNumber, and contactType are required fields!',
     );
   }
-
-  const contact = await createContact({
-    name,
-    phoneNumber,
-    email,
-    isFavourite,
-    contactType,
-    userId: req.user._id,
-  });
-
+  const contact = await createContact({ ...req.body, userId });
   res.status(201).json({
     status: 201,
-    message: 'Successfully created a contact!',
+    message: `Successfully created a contact!`,
     data: contact,
   });
 };
 
-export const patchContactController = async (req, res, next) => {
+export const deleteContactController = async (req, res) => {
   const { contactId } = req.params;
-  const updatedContact = await updateContact(contactId, req.user._id, req.body);
-
-  if (!updatedContact) {
-    next(createHttpError(404, 'Contact not found'));
-    return;
-  }
-
-  res.status(200).json({
-    status: 200,
-    message: `Successfully patched a contact!`,
-    data: updatedContact,
-  });
-};
-
-export const deleteContactController = async (req, res, next) => {
-  const { contactId } = req.params;
-  const contact = await deleteContact(contactId, req.user._id);
+  const { _id: userId } = req.user;
+  const contact = await deleteContact(contactId, userId);
 
   if (!contact) {
-    next(createHttpError(404, 'Contact not found'));
-    return;
+    throw createHttpError(404, 'Contact not found');
   }
 
   res.status(204).send();
+};
+
+export const patchContactController = async (req, res) => {
+  const { contactId } = req.params;
+  const { _id: userId } = req.user;
+  const result = await updateContact(contactId, userId, req.body);
+
+  if (!result) {
+    throw createHttpError(404, 'Contact not found');
+  }
+
+  res.json({
+    status: 200,
+    message: 'Successfully patched a contact!',
+    data: result.contact,
+  });
 };
