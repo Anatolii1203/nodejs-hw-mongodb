@@ -23,25 +23,42 @@ export const getAllContacts = async ({
     contactsQuery.where('isFavourite').equals(filter.isFavourite);
   }
 
-  const [contactsCount, contacts] = await Promise.all([
-    ContactsCollection.find().merge(contactsQuery).countDocuments(),
-    contactsQuery
-      .skip(skip)
-      .limit(limit)
-      .sort({ [sortBy]: sortOrder })
-      .exec(),
-  ]);
+  try {
+    const [contactsCount, contacts] = await Promise.all([
+      contactsQuery.countDocuments(),
+      contactsQuery
+        .skip(skip)
+        .limit(limit)
+        .sort({ [sortBy]: sortOrder })
+        .exec(),
+    ]);
 
-  const paginationData = calculatePaginationData(contactsCount, perPage, page);
-  return {
-    data: contacts,
-    ...paginationData,
-  };
+    const paginationData = calculatePaginationData(
+      contactsCount,
+      perPage,
+      page,
+    );
+    return {
+      data: contacts,
+      ...paginationData,
+    };
+  } catch (error) {
+    // Логування або обробка помилки
+    throw new Error('Error fetching contacts');
+  }
 };
 
 export const getContactByID = async (contactId, userId) => {
-  const contact = await ContactsCollection.findOne({ _id: contactId, userId });
-  return contact;
+  try {
+    const contact = await ContactsCollection.findOne({
+      _id: contactId,
+      userId,
+    });
+    return contact;
+  } catch (error) {
+    // Логування або обробка помилки
+    throw new Error('Error fetching contact');
+  }
 };
 
 export const createContact = async (payload) => {
