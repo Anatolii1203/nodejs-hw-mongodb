@@ -1,16 +1,7 @@
-import { HttpError } from 'http-errors';
+import createHttpError from 'http-errors';
 
-export const notFoundHandler = (err, req, res, next) => {
-  if (err instanceof HttpError) {
-    res.status(err.status).json({
-      status: err.status,
-      message: err.name,
-      data: err,
-    });
-    return;
-  }
-
-  res.status(404).json({
-    message: 'Route not found',
-  });
+const notFoundMiddleware = () => {
+  throw createHttpError(404, 'Route not found');
 };
+
+export default notFoundMiddleware;

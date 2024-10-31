@@ -1,6 +1,6 @@
-import { ContactsCollection } from '../db/models/contacts.js';
-import { calculatePaginationData } from '../utils/calculatePaginationData.js';
 import { SORT_ORDER } from '../constants/index.js';
+import { ContactsCollection } from '../db/models/contact.js';
+import { calculatePaginationData } from '../utils/calculatePaginationData.js';
 
 export const getAllContacts = async ({
   page = 1,
@@ -14,51 +14,33 @@ export const getAllContacts = async ({
   const skip = (page - 1) * perPage;
 
   const contactsQuery = ContactsCollection.find({ userId });
-
   if (filter.contactType) {
     contactsQuery.where('contactType').equals(filter.contactType);
   }
-
-  if (filter.isFavourite !== undefined) {
-    contactsQuery.where('isFavourite').equals(filter.isFavourite);
+  if (filter.isFavorite) {
+    contactsQuery.where('isFavorite').equals(filter.isFavorite);
   }
+  const contactsCount = await ContactsCollection.find()
+    .merge(contactsQuery)
+    .countDocuments();
 
-  try {
-    const [contactsCount, contacts] = await Promise.all([
-      contactsQuery.countDocuments(),
-      contactsQuery
-        .skip(skip)
-        .limit(limit)
-        .sort({ [sortBy]: sortOrder })
-        .exec(),
-    ]);
+  const contacts = await contactsQuery
+    .skip(skip)
+    .limit(limit)
+    .sort({ [sortBy]: sortOrder })
+    .exec();
 
-    const paginationData = calculatePaginationData(
-      contactsCount,
-      perPage,
-      page,
-    );
-    return {
-      data: contacts,
-      ...paginationData,
-    };
-  } catch (error) {
-    // Логування або обробка помилки
-    throw new Error('Error fetching contacts');
-  }
+  const paginationData = calculatePaginationData(contactsCount, perPage, page);
+
+  return {
+    data: contacts,
+    ...paginationData,
+  };
 };
 
-export const getContactByID = async (contactId, userId) => {
-  try {
-    const contact = await ContactsCollection.findOne({
-      _id: contactId,
-      userId,
-    });
-    return contact;
-  } catch (error) {
-    // Логування або обробка помилки
-    throw new Error('Error fetching contact');
-  }
+export const getContactById = async (contactId, userId) => {
+  const contact = await ContactsCollection.findOne({ _id: contactId, userId });
+  return contact;
 };
 
 export const createContact = async (payload) => {
@@ -66,39 +48,33 @@ export const createContact = async (payload) => {
   return contact;
 };
 
+export const deleteContact = async (contactId, userId) => {
+  const contact = await ContactsCollection.findOneAndDelete({
+    _id: contactId,
+    userId,
+  });
+
+  return contact;
+};
+
 export const updateContact = async (
   contactId,
-  payload,
   userId,
+  payload,
   options = {},
 ) => {
-  const rawResult = await ContactsCollection.findByIdAndUpdate(
-    {
-      _id: contactId,
-      userId,
-    },
+  const rawResult = await ContactsCollection.findOneAndUpdate(
+    { _id: contactId, userId },
     payload,
     {
       new: true,
-      includeResultMetadata: true,
       ...options,
     },
   );
 
-  if (!rawResult || !rawResult.value) {
-    return null;
-  }
+  if (!rawResult) return null;
 
   return {
-    contact: rawResult.value,
-    isNew: Boolean(rawResult?.lastErrorObject?.upserted),
+    contact: rawResult,
   };
-};
-
-export const deleteContact = async (contactId, userId) => {
-  const contact = await ContactsCollection.findByIdAndDelete({
-    _id: contactId,
-    userId,
-  });
-  return contact;
 };
