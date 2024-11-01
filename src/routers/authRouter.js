@@ -5,7 +5,7 @@ import {
   registerUserSchema,
   requestResetEmailSchema,
   resetPasswordSchema,
-} from '../validation /auth.js';
+} from '../validation/auth.js';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 import {
   loginUserController,
