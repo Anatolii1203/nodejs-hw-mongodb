@@ -10,7 +10,7 @@
     "dev": "nodemon src/index.js"
   },
   "keywords": [],
-  "author": "Eva-Mykhno <koshka.od@gmail.com>",
+  "author": "Anatolii1203 <v120386t@gmail.com>",
   "license": "ISC",
   "devDependencies": {
     "@eslint/js": "^9.10.0",
