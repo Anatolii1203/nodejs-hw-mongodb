@@ -9,7 +9,7 @@
     "dev": "nodemon src/index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Anatolii1203 <v120386t@gmail.com>",
   "license": "ISC",
   "description": "",
   "devDependencies": {
