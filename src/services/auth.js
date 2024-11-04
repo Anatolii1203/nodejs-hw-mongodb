@@ -136,6 +136,7 @@ export const requestResetToken = async (email) => {
       html,
     });
   } catch (error) {
+    console.log(error); // Логируем ошибку
     if (error.response) {
       throw createHttpError(
         500,
