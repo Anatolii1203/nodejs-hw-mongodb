@@ -8,7 +8,9 @@ import errorHandlerMiddleware from './middlewares/errorHandler.js';
 import cookieParser from 'cookie-parser';
 import { UPLOAD_DIR } from './constants/index.js';
 
-const PORT = env('PORT', '3000');
+const PORT = Number(env('PORT', '3000'));
+const MONGODB_URL =
+  'mongodb+srv://v120386t:645689Tolik@cluster0.atub4.mongodb.net/';
 
 export const setupServer = () => {
   const app = express();
