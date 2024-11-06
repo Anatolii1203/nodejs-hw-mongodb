@@ -11,8 +11,8 @@ export const createContactSchema = Joi.object({
     .messages({
       'string.pattern.base': 'Phone number must be in the format +380XXXXXXXXX',
     }),
-  email: Joi.string().email().min(3).max(20),
-  isFavourite: Joi.boolean(),
+  email: Joi.string().email().min(3).max(30),
+  isFavorite: Joi.boolean(),
   contactType: Joi.string()
     .valid(...contactTypeList)
     .min(3)
@@ -26,7 +26,7 @@ export const updateContactSchema = Joi.object({
     'string.pattern.base': 'Phone number must be in the format +380XXXXXXXXX',
   }),
   email: Joi.string().email().min(3).max(20),
-  isFavourite: Joi.boolean(),
+  isFavorite: Joi.boolean(),
   contactType: Joi.string()
     .valid(...contactTypeList)
     .min(3)

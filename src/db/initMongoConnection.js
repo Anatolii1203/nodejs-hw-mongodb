@@ -11,10 +11,9 @@ export const initMongoConnection = async () => {
     await mongoose.connect(
       `mongodb+srv://v120386t:645689Tolik@cluster0.atub4.mongodb.net/`,
     );
-
     console.log('Mongo connection successfully established!');
-  } catch (error) {
-    console.log('Error while setting up mongo connection', error);
-    throw error;
+  } catch (err) {
+    console.log('Error while setting up mongo connection', err);
+    throw err;
   }
 };
